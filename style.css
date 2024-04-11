@@ -1,3 +1,5 @@
+/* General style */
+
 :root {
     --light: ghostwhite;
     --dark: black;
@@ -10,25 +12,44 @@ body {
     background-color: var(--light);
 }
 
+.button {
+    border: 0;
+    background: var(--dark);
+    color: white;
+    font-family: sans-serif;
+    font-size: 1rem;
+    line-height: 1.2;
+    white-space: nowrap;
+    text-decoration: none;
+    padding: 0.5rem 0.5rem;
+    margin: 0.25rem;
+    cursor: pointer;
+}
+
 /* index style */
 
 #startGame {
     width: 80%;
     max-width: 400px;
     margin: 1rem auto 0;
- }
+}
 
- #startGame input {
+#startGame input {
     margin-top: 1rem;
     max-width: 10rem;
- }
+}
 
 /* scoreboard style */
+
+#content-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 
 table {
     width: 80%;
     max-width: 300px;
-    margin: auto;
     border: 2px solid black;
     border-spacing: 0;
 }
@@ -47,15 +68,16 @@ td {
     text-align: center;
 }
 
-table th:not(:nth-child(1)),td:not(:nth-child(1)) { 
+table th:not(:nth-child(1)),
+td:not(:nth-child(1)) {
     cursor: pointer;
 }
 
-#addTurn, #finishGame {
+#addTurn,
+#finishGame {
     width: 80%;
     max-width: 300px;
-    margin: 1em auto 0;
-    /* line-height: 1.5; */
+    margin: 1em;
 }
 
 #addTurn fieldset {
@@ -66,7 +88,7 @@ table th:not(:nth-child(1)),td:not(:nth-child(1)) {
 #addTurn .grid-container {
     display: grid;
     gap: 0.5rem;
-    grid-template-columns: repeat( auto-fit, minmax(4rem, 1fr) );
+    grid-template-columns: repeat(auto-fit, minmax(4rem, 1fr));
     justify-items: center;
 }
 
@@ -107,25 +129,20 @@ table th:not(:nth-child(1)),td:not(:nth-child(1)) {
     text-decoration: underline var(--dark);
 }
 
-/* #finishGame input[type=submit] {
-    background-color: var(--light);
-    color: var(--dark);
-    margin: 0;
-    padding: 0.5rem 1rem;
-    border-top: 2px solid black;
-    text-decoration: underline var(--dark);
-} */
+/* Use an horizontal layout for desktop */
+@media (min-width: 768px) {
+    #content-container {
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+    }
 
-.button {
-    border: 0;
-    background: var(--dark);
-    color: white;
-    font-family: sans-serif;
-    font-size: 1rem;
-    line-height: 1.2;
-    white-space: nowrap;
-    text-decoration: none;
-    padding: 0.5rem 0.5rem;
-    margin: 0.25rem;
-    cursor: pointer;
+    table {
+        margin-right: 2rem;
+    }
+
+    #addTurn,
+    #finishGame {
+        margin: 0;
+    }
 }
