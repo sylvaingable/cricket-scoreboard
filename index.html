@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fr-FR">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width" />
+    <title>Démarrer une partie</title>
+    <!-- Emoji as a favicon, as per https://css-tricks.com/emoji-as-a-favicon/ -->
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>">
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js"></script>
+</head>
+
+<body>
+    <form id="startGame">
+        <fieldset>
+            <legend>Démarrer une partie</legend>
+            <label>
+                Équipe 1 : <input type="text" name="team1" id="team1" required>
+            </label><br>
+            <label>
+                Équipe 2 : <input type="text" name="team2" id="team2" required>
+            </label><br>
+            <label>
+                Inclure Bullseye ? <input type="checkbox" name="includeBullsEye" id="includeBullsEye">
+            </label><br>
+            <input type="submit" value="Démarrer" class="button">
+        </fieldset>
+    </form>
+    <script>
+        let gameData = getGameData();
+        if (gameData.isGameStarted === true) {
+            window.location.href = 'scoreboard.html';
+        }
+        const form = document.forms.startGame;
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            startGame(form.team1.value, form.team2.value, form.includeBullsEye.checked);
+            window.location.href = 'scoreboard.html';
+        });
+    </script>
+</body>
+
+
+</html>

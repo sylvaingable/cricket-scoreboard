@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="fr-FR">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width" />
+    <title>Scores</title>
+    <!-- Emoji as a favicon, as per https://css-tricks.com/emoji-as-a-favicon/ -->
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>">
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="stylesheet" href="style.css">
+    <script src="counter-button.js"></script>
+    <script src="script.js"></script>
+</head>
+
+<body>
+    <table id="scoreBoard">
+        <caption>Scores</caption>
+        <thead>
+            <tr>
+                <th>Points</th>
+                <th id="team1Name">Team 1</th>
+                <th id="team2Name">Team 2</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>20</td>
+                <td id="team1_20s"></td>
+                <td id="team2_20s"></td>
+            </tr>
+            <tr>
+                <td>19</td>
+                <td id="team1_19s"></td>
+                <td id="team2_19s"></td>
+            </tr>
+            <tr>
+                <td>18</td>
+                <td id="team1_18s"></td>
+                <td id="team2_18s"></td>
+            </tr>
+            <tr>
+                <td>17</td>
+                <td id="team1_17s"></td>
+                <td id="team2_17s"></td>
+            </tr>
+            <tr>
+                <td>16</td>
+                <td id="team1_16s"></td>
+                <td id="team2_16s"></td>
+            </tr>
+            <tr>
+                <td>15</td>
+                <td id="team1_15s"></td>
+                <td id="team2_15s"></td>
+            </tr>
+            <tr id="bullsEyeRow">
+                <td>BE</td>
+                <td id="team1_25s"></td>
+                <td id="team2_25s"></td>
+            </tr>
+        <tfoot>
+
+            <td>Total</td>
+            <td id="team1Total"></td>
+            <td id="team2Total"></td>
+        </tfoot>
+        </tbody>
+    </table>
+    <script>
+        function setTotalPoints() {
+            document.getElementById('team1Total').innerText = getTeamTotalPoints(1);
+            document.getElementById('team2Total').innerText = getTeamTotalPoints(2);
+        }
+        function setMarks() {
+            for (var team of [1, 2]) {
+                for (var number of [20, 19, 18, 17, 16, 15, 25]) {
+                    document.getElementById(`team${team}_${number}s`).innerText = getNumberMark(team, number);
+                }
+            }
+        }
+        let gameData = getGameData();
+        // Redirect to home page if game is not started
+        if (gameData.isGameStarted === false) {
+            window.location.href = 'index.html';
+        }
+        if (gameData.includeBullsEye === false) {
+            document.getElementById('bullsEyeRow').style.display = 'none';
+        }
+
+        let activeTeam = 1;
+
+        function setActiveTeam(team) {
+            activeTeam = team;
+            const activeColIndex = team + 1;
+            const inactiveColIndex = activeColIndex === 2 ? 3 : 2;
+            const activeCells = document.querySelectorAll(
+                `#scoreBoard th:nth-child(${activeColIndex}),#scoreBoard td:nth-child(${activeColIndex})`
+            );
+            for (const cell of activeCells) {
+                cell.style.backgroundColor = 'var(--light-accent)';
+            }
+            const inactiveCells = document.querySelectorAll(
+                `#scoreBoard th:nth-child(${inactiveColIndex}),#scoreBoard td:nth-child(${inactiveColIndex})`
+            );
+            for (const cell of inactiveCells) {
+                cell.style.backgroundColor = 'var(--light)';
+            }
+        }
+
+        const activateTeam1 = () => {setActiveTeam(1)}
+        const activateTeam2 = () => {setActiveTeam(2)}
+
+        // Add an onclick event listener to each cells of each team column to toggle
+        // the active team
+        const team1Cells = document.querySelectorAll(
+            '#scoreBoard th:nth-child(2),#scoreBoard td:nth-child(2)'
+        );
+        for (const cell of team1Cells) {
+            cell.addEventListener('click', activateTeam1);
+        }
+        const team2Cells = document.querySelectorAll(
+            '#scoreBoard th:nth-child(3),#scoreBoard td:nth-child(3)'
+        );
+        for (const cell of team2Cells) {
+            cell.addEventListener('click', activateTeam2);
+        }
+
+        // Set team names
+        document.getElementById('team1Name').innerText = gameData.teams[1].name;
+        document.getElementById('team2Name').innerText = gameData.teams[2].name;
+        // Init total points
+        setTotalPoints();
+        setMarks();
+        // Make team 1 active to begin with
+        setActiveTeam(1);
+    </script>
+
+    <form id="addTurn">
+        <fieldset>
+            <legend>Points marqués</legend>
+            <div class="grid-container">
+                <counter-button label="20" name="numberOf20s"></counter-button>
+                <counter-button label="19" name="numberOf19s"></counter-button>
+                <counter-button label="18" name="numberOf18s"></counter-button>
+                <counter-button label="17" name="numberOf17s"></counter-button>
+                <counter-button label="16" name="numberOf16s"></counter-button>
+                <counter-button label="15" name="numberOf15s"></counter-button>
+                <counter-button label="25" name="numberOf25s"></counter-button>
+            </div>
+        </fieldset>
+        <div id="actions">
+            <input type="submit" value="Ajouter" class="button">
+        </div>
+    </form>
+    <script>
+        if (gameData.includeBullsEye === false) {
+            document.querySelector('counter-button[name=numberOf25s]').style.display = 'none';
+        }
+
+        function swapForms() {
+            addTurnForm = document.getElementById('addTurn');
+            addTurnForm.hidden = !addTurnForm.hidden;
+            finishGameForm = document.getElementById('finishGame');
+            finishGameForm.hidden = !finishGameForm.hidden;
+        }
+
+        const form = document.forms.addTurn;
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            otherTeam = activeTeam === 1 ? 2 : 1;
+            activeTeamTurnsSum = sumTeamTurns(activeTeam);
+            otherTeamTurnsSum = sumTeamTurns(otherTeam);
+            let points = {};
+            for (const number of [20, 19, 18, 17, 16, 15, 25]) {
+                counter = event.target.querySelector(`counter-button[name=numberOf${number}s]`);
+                if (otherTeamTurnsSum[number] < 3) {
+                    points[number] = counter.value;
+                } else {
+                    points[number] = Math.min(counter.value, 3 - activeTeamTurnsSum[number]);
+                }
+                counter.value = 0;
+            }
+            addTurn(activeTeam, points);
+            setTotalPoints();
+            setMarks();
+            if (hasWon({team: activeTeam, includeBullsEye: gameData.includeBullsEye})) {
+                document.getElementById('winner').innerText = gameData.teams[activeTeam].name;
+                document.getElementById('team1AvgHits').innerText = getAvgHitsPerTurn(1);
+                document.getElementById('team2AvgHits').innerText = getAvgHitsPerTurn(2);
+                document.getElementById('team1EmptyTurnsCount').innerText = countEmptyTurns(1);
+                document.getElementById('team2EmptyTurnsCount').innerText = countEmptyTurns(2);
+                swapForms();
+            }
+            setActiveTeam(otherTeam);
+        });
+    </script>
+    <form id="finishGame" hidden>
+        <h2>🏆 Victoire <span id="winner"></span> ! 🏆</h2>
+        <table>
+            <tbody>
+                <tr>
+                    <td>Moy 🎯</td>
+                    <td id="team1AvgHits"></td>
+                    <td id="team2AvgHits"></td>
+                </tr>
+                <tr>
+                    <td>Tot 💩</td>
+                    <td id="team1EmptyTurnsCount"></td>
+                    <td id="team2EmptyTurnsCount"></td>
+                </tr>
+            </tbody>
+        </table>
+        <div id="actions">
+            <input type="submit" id="changeTeams" value="Changer équipes" class="button">
+            <input type="submit" id="startOver" value="Recommencer" class="button">
+        </div>
+    </form>
+    <script>
+        document.getElementById("changeTeams").addEventListener('click', function(event) {
+            event.preventDefault();
+            setGameData(gameInitialData)
+            window.location.href = 'index.html';
+        });
+        document.getElementById("startOver").addEventListener('click', function(event) {
+            event.preventDefault();
+            resetGameData();
+            swapForms();
+        });        
+    </script>
+</body>
+
+</html>
