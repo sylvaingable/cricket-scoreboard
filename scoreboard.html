@@ -179,7 +179,12 @@
                     if (otherTeamTurnsSum[number] < 3) {
                         points[number] = counter.value;
                     } else {
-                        points[number] = Math.min(counter.value, 3 - activeTeamTurnsSum[number]);
+                        // Once the other team has 3 marks on a number, the active team
+                        // can only score as many times left to reach 3 marks too
+                        points[number] = Math.min(
+                            counter.value,
+                            Math.max(3 - activeTeamTurnsSum[number], 0)  // Prevent negative values
+                        );
                     }
                     counter.value = 0;
                 }
