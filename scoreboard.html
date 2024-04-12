@@ -203,7 +203,7 @@
             });
         </script>
         <form id="finishGame" hidden>
-            <h2>🏆 Victoire <span id="winner"></span> ! 🏆</h2>
+            <h2>🏆 Victoire <span id="winner"></span> 🏆</h2>
             <table>
                 <tbody>
                     <tr>
@@ -233,6 +233,8 @@
                 event.preventDefault();
                 resetGameData();
                 swapForms();
+                setTotalPoints();
+                setMarks();
             });        
         </script>
     </div>
