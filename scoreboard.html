@@ -161,21 +161,21 @@
             }
 
             function swapForms() {
-                addTurnForm = document.getElementById('addTurn');
+                const addTurnForm = document.getElementById('addTurn');
                 addTurnForm.hidden = !addTurnForm.hidden;
-                finishGameForm = document.getElementById('finishGame');
+                const finishGameForm = document.getElementById('finishGame');
                 finishGameForm.hidden = !finishGameForm.hidden;
             }
 
             const form = document.forms.addTurn;
             form.addEventListener('submit', (event) => {
                 event.preventDefault();
-                otherTeam = activeTeam === 1 ? 2 : 1;
-                activeTeamTurnsSum = sumTeamTurns(activeTeam);
-                otherTeamTurnsSum = sumTeamTurns(otherTeam);
+                const otherTeam = activeTeam === 1 ? 2 : 1;
+                const activeTeamTurnsSum = sumTeamTurns(activeTeam);
+                const otherTeamTurnsSum = sumTeamTurns(otherTeam);
                 let points = {};
                 for (const number of [20, 19, 18, 17, 16, 15, 25]) {
-                    counter = event.target.querySelector(`counter-button[name=numberOf${number}s]`);
+                    const counter = event.target.querySelector(`counter-button[name=numberOf${number}s]`);
                     if (otherTeamTurnsSum[number] < 3) {
                         points[number] = counter.value;
                     } else {

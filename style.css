@@ -8,7 +8,8 @@
 
 body {
     font-family: sans-serif;
-    font-size: large;
+    font-size: 1.3rem;
+    line-height: 1.3rem;
     background-color: var(--light);
 }
 
@@ -34,9 +35,29 @@ body {
     margin: 1rem auto 0;
 }
 
-#startGame input {
-    margin-top: 1rem;
-    max-width: 10rem;
+#startGame #container {
+    max-width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#startGame .line, #startGame #actions {
+    margin-top: 1.3rem;
+    line-height: 1.3rem;
+}
+
+#startGame .line input {
+    height: 1.3rem;
+}
+
+#startGame input[type=checkbox] {
+    width: 1.3rem;
+
+}
+
+#startGame #actions {
+    display: flex;
+    justify-content: center;
 }
 
 /* scoreboard style */
