@@ -62,7 +62,6 @@
                     <td id="team2_25s"></td>
                 </tr>
             <tfoot>
-
                 <td>Total</td>
                 <td id="team1Total"></td>
                 <td id="team2Total"></td>
@@ -70,31 +69,42 @@
             </tbody>
         </table>
         <script>
-            function setTotalPoints() {
-                document.getElementById('team1Total').innerText = getTeamTotalPoints(1);
-                document.getElementById('team2Total').innerText = getTeamTotalPoints(2);
+            function setTotalPoints(turns) {
+                // Sets the total row values
+                const team1Turns = getTeamTurns(turns, 1);
+                const team2Turns = getTeamTurns(turns, 2);
+                document.getElementById('team1Total').innerText = getTeamTotalPoints(team1Turns);
+                document.getElementById('team2Total').innerText = getTeamTotalPoints(team2Turns);
             }
-            function setMarks() {
-                for (var team of [1, 2]) {
+
+            function setMarks(turns) {
+                const team1Turns = getTeamTurns(turns, 1);
+                const team2Turns = getTeamTurns(turns, 2);
+                // Set marks according to hit numbers for each team
+                for (var [team, teamTurns] of [[1, team1Turns], [2, team2Turns]]) {
                     for (var number of [20, 19, 18, 17, 16, 15, 25]) {
-                        document.getElementById(`team${team}_${number}s`).innerText = getNumberMark(team, number);
+                        document.getElementById(`team${team}_${number}s`).innerText = getNumberMark(teamTurns, number);
                     }
                 }
             }
-            let gameData = getGameData();
+
+            const initialGameData = getGameData();
             // Redirect to home page if game is not started
-            if (gameData.isGameStarted === false) {
+            if (initialGameData.isGameStarted === false) {
                 window.location.href = 'index.html';
             }
-            if (gameData.includeBullsEye === false) {
+            const isBullsEyeIncluded = initialGameData.includeBullsEye;
+            // Hide the bullseye row if the game does not include it
+            if (isBullsEyeIncluded === false) {
                 document.getElementById('bullsEyeRow').style.display = 'none';
             }
 
-            let activeTeam = 1;
+            let activeTeam;
 
-            function setActiveTeam(team) {
-                activeTeam = team;
-                const activeColIndex = team + 1;
+            function toggleActiveTeam() {
+                activeTeam = activeTeam === 1 ? 2 : 1;
+                // Highlight the active team column
+                const activeColIndex = activeTeam + 1;
                 const inactiveColIndex = activeColIndex === 2 ? 3 : 2;
                 const activeCells = document.querySelectorAll(
                     `#scoreBoard th:nth-child(${activeColIndex}),#scoreBoard td:nth-child(${activeColIndex})`
@@ -110,37 +120,28 @@
                 }
             }
 
-            const activateTeam1 = () => { setActiveTeam(1) }
-            const activateTeam2 = () => { setActiveTeam(2) }
-
             // Add an onclick event listener to each cells of each team column to toggle
             // the active team
-            const team1Cells = document.querySelectorAll(
-                '#scoreBoard th:nth-child(2),#scoreBoard td:nth-child(2)'
+            const teamsCells = document.querySelectorAll(
+                '#scoreBoard th:not(:first-child),#scoreBoard td:not(:first-child)'
             );
-            for (const cell of team1Cells) {
-                cell.addEventListener('click', activateTeam1);
-            }
-            const team2Cells = document.querySelectorAll(
-                '#scoreBoard th:nth-child(3),#scoreBoard td:nth-child(3)'
-            );
-            for (const cell of team2Cells) {
-                cell.addEventListener('click', activateTeam2);
+            for (const cell of teamsCells) {
+                cell.addEventListener('click', toggleActiveTeam);
             }
 
             // Set team names
-            document.getElementById('team1Name').innerText = gameData.teams[1].name;
-            document.getElementById('team2Name').innerText = gameData.teams[2].name;
-            // Init total points
-            setTotalPoints();
-            setMarks();
-            // Make team 1 active to begin with
-            setActiveTeam(1);
+            document.getElementById('team1Name').innerText = initialGameData.teams[1];
+            document.getElementById('team2Name').innerText = initialGameData.teams[2];
+
+            // Make a team active on load
+            if (activeTeam === undefined) {
+                toggleActiveTeam();
+            }
         </script>
 
         <form id="addTurn">
             <fieldset>
-                <legend>Points marqués</legend>
+                <legend>Tour <span id="turnIndex"></span></legend>
                 <div class="grid-container">
                     <counter-button label="20" name="numberOf20s"></counter-button>
                     <counter-button label="19" name="numberOf19s"></counter-button>
@@ -152,30 +153,66 @@
                 </div>
             </fieldset>
             <div id="actions">
-                <input type="submit" value="Ajouter" class="button">
+                <div id="seekTurns">
+                    <input type="submit" value="<" class="button" id="previous" />
+                    <input type="submit" value=">" class="button" id="next" />
+                </div>
+                <input type="submit" value="Valider" class="button" id="add">
             </div>
         </form>
         <script>
-            if (gameData.includeBullsEye === false) {
+            // Hide the bullseye counter if the game does not include it
+            if (isBullsEyeIncluded === false) {
                 document.querySelector('counter-button[name=numberOf25s]').style.display = 'none';
             }
 
-            function swapForms() {
-                const addTurnForm = document.getElementById('addTurn');
-                addTurnForm.hidden = !addTurnForm.hidden;
-                const finishGameForm = document.getElementById('finishGame');
-                finishGameForm.hidden = !finishGameForm.hidden;
+            let activeTurnIndex = initialGameData.turns.length;
+
+            function setTurnLabel(index) {
+                document.getElementById('turnIndex').innerText = index + 1;
             }
 
-            const form = document.forms.addTurn;
-            form.addEventListener('submit', (event) => {
+            function hideSubmitButton() {
+                document.getElementById('add').style.visibility = 'hidden';
+            }
+
+            function showSubmitButton() {
+                document.getElementById('add').style.visibility = 'visible';
+            }
+
+            function setCounters(turn) {
+                for (const [number, value] of Object.entries(turn)) {
+                    const counter = document.querySelector(`counter-button[name=numberOf${number}s]`);
+                    counter.value = value;
+                }
+            }
+
+            document.getElementById("previous").addEventListener('click', (event) => {
+                event.preventDefault();
+                activeTurnIndex--;
+                refreshUI();
+                toggleActiveTeam();
+            });
+
+            document.getElementById("next").addEventListener('click', (event) => {
+                event.preventDefault();
+                activeTurnIndex++;
+                refreshUI();
+                toggleActiveTeam();
+            });
+
+            document.getElementById("add").addEventListener('click', (event) => {
                 event.preventDefault();
                 const otherTeam = activeTeam === 1 ? 2 : 1;
-                const activeTeamTurnsSum = sumTeamTurns(activeTeam);
-                const otherTeamTurnsSum = sumTeamTurns(otherTeam);
+                const turns = getPlayedTurns(activeTurnIndex)
+                const activeTeamTurns = getTeamTurns(turns, activeTeam);
+                const activeTeamTurnsSum = sumTeamTurns(activeTeamTurns);
+                const otherTeamTurns = getTeamTurns(turns, otherTeam);
+                const otherTeamTurnsSum = sumTeamTurns(otherTeamTurns);
+                const addTurnForm = document.getElementById('addTurn');
                 let points = {};
                 for (const number of [20, 19, 18, 17, 16, 15, 25]) {
-                    const counter = event.target.querySelector(`counter-button[name=numberOf${number}s]`);
+                    const counter = addTurnForm.querySelector(`counter-button[name=numberOf${number}s]`);
                     if (otherTeamTurnsSum[number] < 3) {
                         points[number] = counter.value;
                     } else {
@@ -188,18 +225,10 @@
                     }
                     counter.value = 0;
                 }
-                addTurn(activeTeam, points);
-                setTotalPoints();
-                setMarks();
-                if (hasWon({ team: activeTeam, includeBullsEye: gameData.includeBullsEye })) {
-                    document.getElementById('winner').innerText = gameData.teams[activeTeam].name;
-                    document.getElementById('team1AvgHits').innerText = getAvgHitsPerTurn(1);
-                    document.getElementById('team2AvgHits').innerText = getAvgHitsPerTurn(2);
-                    document.getElementById('team1EmptyTurnsCount').innerText = countEmptyTurns(1);
-                    document.getElementById('team2EmptyTurnsCount').innerText = countEmptyTurns(2);
-                    swapForms();
-                }
-                setActiveTeam(otherTeam);
+                setTurn(activeTeam, points, activeTurnIndex);
+                activeTurnIndex++;
+                refreshUI();
+                toggleActiveTeam();
             });
         </script>
         <form id="finishGame" hidden>
@@ -224,20 +253,88 @@
             </div>
         </form>
         <script>
-            document.getElementById("changeTeams").addEventListener('click', function (event) {
+            document.getElementById("changeTeams").addEventListener('click', (event) => {
                 event.preventDefault();
                 setGameData(gameInitialData)
                 window.location.href = 'index.html';
             });
-            document.getElementById("startOver").addEventListener('click', function (event) {
+            document.getElementById("startOver").addEventListener('click', (event) => {
                 event.preventDefault();
-                resetGameData();
+                restartGame();
                 swapForms();
-                setTotalPoints();
-                setMarks();
+                refreshUI();
             });        
         </script>
     </div>
+    <script>
+        function swapForms() {
+            const addTurnForm = document.getElementById('addTurn');
+            addTurnForm.hidden = !addTurnForm.hidden;
+            const finishGameForm = document.getElementById('finishGame');
+            finishGameForm.hidden = !finishGameForm.hidden;
+        }
+
+        function refreshUI() {
+            const turns = getPlayedTurns(activeTurnIndex + 1);
+            const team1Turns = getTeamTurns(turns, 1);
+            const team2Turns = getTeamTurns(turns, 2);
+            
+            // When the game is over, swap the this form for the end game form
+            if (
+                hasWon({ teamTurns: team1Turns, includeBullsEye: isBullsEyeIncluded })
+                || hasWon({ teamTurns: team2Turns, includeBullsEye: isBullsEyeIncluded })
+            ) {
+                document.getElementById('winner').innerText = initialGameData.teams[activeTeam];
+                document.getElementById('team1AvgHits').innerText = getAvgHitsPerTurn(team1Turns);
+                document.getElementById('team2AvgHits').innerText = getAvgHitsPerTurn(team2Turns);
+                document.getElementById('team1EmptyTurnsCount').innerText = countEmptyTurns(team1Turns);
+                document.getElementById('team2EmptyTurnsCount').innerText = countEmptyTurns(team2Turns);
+                swapForms();
+            }
+
+            setTurnLabel(activeTurnIndex);
+            
+            // Show the previous turn button if at least one turn has been played
+            const addTurnForm = document.forms.addTurn;
+            const previousButton = addTurnForm.querySelector('#previous');
+            if (activeTurnIndex === 0) {
+                previousButton.style.visibility = 'hidden';
+            } else {
+                previousButton.style.visibility = 'visible';
+            }
+
+            // Show the next turn button if there are turns after the current one
+            const playedTurnsCount = getPlayedTurns().length
+            const nextButton = addTurnForm.querySelector('#next');
+            if (activeTurnIndex === playedTurnsCount) {
+                nextButton.style.visibility = 'hidden';
+                setCounters(emptyTurn);
+            } else {
+                nextButton.style.visibility = 'visible';
+                setCounters(turns[turns.length - 1] ?? emptyTurn);
+            }
+
+            // Hide the submit turn button if we're more that 1 turn behind the current
+            // turn, as editing older turns could change the points scored for
+            // in-between turns.
+            // For example, let's it's turn #3 and that the first two turns were:
+            // - Team 1: 2 20s
+            // - Team 2: 4 20s
+            // At the the beginning of turn #3, Team 2 has thus 20 points. If it was
+            // possible to edit turn #1, and change it to 3 20s, then Team 2 could not
+            // have score 4 20s in turn #2 but only 3 and should have 0 point.
+            if (activeTurnIndex < playedTurnsCount - 1) {
+                hideSubmitButton();
+            } else {
+                showSubmitButton();
+            }
+
+            setTotalPoints(turns);
+            setMarks(turns);
+        }
+
+        refreshUI(); // On page load to reflect the initial state
+    </script>
 </body>
 
 </html>

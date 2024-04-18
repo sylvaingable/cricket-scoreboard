@@ -41,7 +41,8 @@ body {
     margin-right: auto;
 }
 
-#startGame .line, #startGame #actions {
+#startGame .line,
+#startGame #actions {
     margin-top: 1.3rem;
     line-height: 1.3rem;
 }
@@ -115,16 +116,20 @@ td:not(:nth-child(1)) {
 
 #addTurn #actions {
     display: flex;
-    justify-content: end;
+    justify-content: space-between;
     border: 1px solid black;
     border-top: 0;
 }
 
 #addTurn input[type=submit] {
-    background-color: var(--light-accent);
+    background-color: var(--light);
     color: var(--dark);
     margin: 0;
     padding: 0.5rem 1rem;
+}
+
+#addTurn #add {
+    background-color: var(--light-accent);
     border-left: 1px solid black;
     text-decoration: underline var(--dark);
 }
