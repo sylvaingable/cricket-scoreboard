@@ -12,7 +12,7 @@ class CounterButton extends HTMLElement {
   connectedCallback() {
     this.render();
     this.containerElement = this.shadowRoot.querySelector(".container");
-    this.counterElement = this.shadowRoot.querySelector("span");
+    this.counterElement = this.shadowRoot.querySelector("#value");
     this.containerElement.addEventListener("click", () => this.increment());
   }
 
@@ -49,12 +49,18 @@ class CounterButton extends HTMLElement {
   set value(newValue) {
     this._counter = newValue;
     this.counterElement.textContent = this._counter;
+    this.containerElement.style.backgroundColor =
+      newValue !== 0 ? "var(--light-accent)" : "var(--light)";
   }
 
   increment() {
-    this._counter = (this._counter + 1) % 10;
-    this.counterElement.textContent = this._counter;
-    this.dispatchEvent(new CustomEvent("input")); // Dispatch an input event when the counter changes
+    const newValue = (this._counter + 1) % 10;
+    this._counter = newValue;
+    this.counterElement.textContent = newValue;
+    // Dispatch an input event when the counter changes
+    this.dispatchEvent(new CustomEvent("input"));
+    this.containerElement.style.backgroundColor =
+      newValue !== 0 ? "var(--light-accent)" : "var(--light)";
   }
 
   render() {
@@ -69,6 +75,8 @@ class CounterButton extends HTMLElement {
           height: 2rem;
           display: flex;
           align-items: center;
+          // align-items: stretch;
+          // align-content: center;
           border: 1px solid var(--dark);
           font-size: 1rem;
           font-family: sans-serif;
@@ -83,16 +91,16 @@ class CounterButton extends HTMLElement {
           font-family: sans-serif;
           padding: 0.25rem 0.5rem;
         }
-        span {
+        #value {
           padding: 0 0.5rem;
         }
       </style>
       <div class="container">
         <button>${this.label}</button>
-        <span>${this._counter}</span>
+        <div id="value">${this._counter}</div>
       </div>
     `;
   }
 }
 
-customElements.define('counter-button', CounterButton);
+customElements.define("counter-button", CounterButton);
