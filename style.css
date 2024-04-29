@@ -83,6 +83,12 @@ table caption {
 th {
     padding: 0.5rem;
     border-bottom: 2px solid black;
+    font-weight: bold;
+}
+
+tbody th {
+    border: none;
+    font-weight: normal;
 }
 
 td {
@@ -92,6 +98,7 @@ td {
 
 tfoot td {
     border-top: 2px solid black;
+    font-weight: bold;
 }
 
 table th:not(:nth-child(1)),
