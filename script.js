@@ -28,24 +28,23 @@ function restartGame() {
   let gameData = getGameData();
   // Keep the teams and game config but reset the turns
   gameData.turns = [];
+  // Swap the starting team
+  gameData.startingTeam = gameData.startingTeam === 1 ? 2 : 1;
   setGameData(gameData);
 }
 
 function startGame(firstTeamName, secondTeamName, includeBullsEye) {
   const data = getGameData();
   data.teams[1] = firstTeamName;
+  data.startingTeam = 1;
   data.teams[2] = secondTeamName;
   data.includeBullsEye = includeBullsEye;
   data.isGameStarted = true;
   setGameData(data);
 }
 
-function setTurn(team, turn, turnIndex) {
+function setTurn(turn, turnIndex) {
   const data = getGameData();
-  // Set the starting team on the first turn
-  if (data.turns.length === 0 && data.startingTeam === null) {
-    data.startingTeam = team;
-  }
   if (turnIndex !== undefined) {
     data.turns[turnIndex] = turn;
   } else {

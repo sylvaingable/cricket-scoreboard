@@ -99,7 +99,7 @@
                 document.getElementById('bullsEyeRow').style.display = 'none';
             }
 
-            let activeTeam;
+            let activeTeam = initialGameData.startingTeam ?? 1;
 
             function toggleActiveTeam() {
                 activeTeam = activeTeam === 1 ? 2 : 1;
@@ -133,10 +133,9 @@
             document.getElementById('team1Name').innerText = initialGameData.teams[1];
             document.getElementById('team2Name').innerText = initialGameData.teams[2];
 
-            // Make a team active on load
-            if (activeTeam === undefined) {
-                toggleActiveTeam();
-            }
+            // Make the starting team active on load by toggling it twice
+            toggleActiveTeam();
+            toggleActiveTeam();
         </script>
 
         <form id="addTurn">
@@ -225,7 +224,7 @@
                     }
                     counter.value = 0;
                 }
-                setTurn(activeTeam, points, activeTurnIndex);
+                setTurn(points, activeTurnIndex);
                 activeTurnIndex++;
                 refreshUI();
                 toggleActiveTeam();
@@ -261,8 +260,7 @@
             document.getElementById("startOver").addEventListener('click', (event) => {
                 event.preventDefault();
                 restartGame();
-                swapForms();
-                refreshUI();
+                location.reload();
             });        
         </script>
     </div>
