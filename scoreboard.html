@@ -10,7 +10,7 @@
         href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>">
     <meta name="robots" content="noindex, nofollow" />
     <link rel="stylesheet" href="style.css">
-    <script src="counter-button.js"></script>
+    <script src="button-counter.js"></script>
     <script src="script.js"></script>
 </head>
 
@@ -142,13 +142,13 @@
             <fieldset>
                 <legend>Tour <span id="turnIndex"></span></legend>
                 <div class="grid-container">
-                    <counter-button label="20" name="numberOf20s"></counter-button>
-                    <counter-button label="19" name="numberOf19s"></counter-button>
-                    <counter-button label="18" name="numberOf18s"></counter-button>
-                    <counter-button label="17" name="numberOf17s"></counter-button>
-                    <counter-button label="16" name="numberOf16s"></counter-button>
-                    <counter-button label="15" name="numberOf15s"></counter-button>
-                    <counter-button label="25" name="numberOf25s"></counter-button>
+                    <button-counter data-label="20" data-name="numberOf20s"></button-counter>
+                    <button-counter data-label="19" data-name="numberOf19s"></button-counter>
+                    <button-counter data-label="18" data-name="numberOf18s"></button-counter>
+                    <button-counter data-label="17" data-name="numberOf17s"></button-counter>
+                    <button-counter data-label="16" data-name="numberOf16s"></button-counter>
+                    <button-counter data-label="15" data-name="numberOf15s"></button-counter>
+                    <button-counter data-label="25" data-name="numberOf25s"></button-counter>
                 </div>
             </fieldset>
             <div id="actions">
@@ -162,7 +162,7 @@
         <script>
             // Hide the bullseye counter if the game does not include it
             if (isBullsEyeIncluded === false) {
-                document.querySelector('counter-button[name=numberOf25s]').style.display = 'none';
+                document.querySelector('button-counter[data-name=numberOf25s]').style.display = 'none';
             }
 
             let activeTurnIndex = initialGameData.turns.length;
@@ -181,8 +181,8 @@
 
             function setCounters(turn) {
                 for (const [number, value] of Object.entries(turn)) {
-                    const counter = document.querySelector(`counter-button[name=numberOf${number}s]`);
-                    counter.value = value;
+                    const counter = document.querySelector(`button-counter[data-name=numberOf${number}s]`);
+                    counter.dataset.value = value;
                 }
             }
 
@@ -211,7 +211,7 @@
                 const addTurnForm = document.getElementById('addTurn');
                 let points = {};
                 for (const number of [20, 19, 18, 17, 16, 15, 25]) {
-                    const counter = addTurnForm.querySelector(`counter-button[name=numberOf${number}s]`);
+                    const counter = addTurnForm.querySelector(`button-counter[data-name=numberOf${number}s]`);
                     if (otherTeamTurnsSum[number] < 3) {
                         points[number] = counter.value;
                     } else {
@@ -222,7 +222,7 @@
                             Math.max(3 - activeTeamTurnsSum[number], 0)  // Prevent negative values
                         );
                     }
-                    counter.value = 0;
+                    counter.reset();
                 }
                 setTurn(points, activeTurnIndex);
                 activeTurnIndex++;

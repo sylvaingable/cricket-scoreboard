@@ -106,6 +106,24 @@ td:not(:nth-child(1)) {
     cursor: pointer;
 }
 
+button-counter::part(container) {
+    border: 1px solid var(--dark);
+    color: var(--dark);
+}
+
+button-counter::part(button) {
+    background-color: var(--dark);
+    color: white;
+}
+
+button-counter:not([data-value="0"])::part(container) {
+    background-color: var(--light-accent);
+}
+
+button-counter[data-value="0"]::part(container) {
+    background-color: var(--light);
+}
+
 #addTurn,
 #finishGame {
     width: 80%;
